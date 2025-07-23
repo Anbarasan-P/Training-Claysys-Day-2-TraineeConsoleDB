@@ -154,52 +154,156 @@ namespace TraineeConsoleDB
             Console.Write("Enter Trainee ID to update: ");
             int id = int.Parse(Console.ReadLine());
 
-            Console.Write("New Name: ");
-            string name = Console.ReadLine();   
+            Console.WriteLine("Select the field to update:");
+            Console.WriteLine("1. Name");
+            Console.WriteLine("2. Email");
+            Console.WriteLine("3. Phone Number");
+            Console.WriteLine("4. Department");
+            Console.WriteLine("5. Joining Date");
+            Console.WriteLine("6. Gender");
+            Console.WriteLine("7. Photo");
 
-            Console.Write("New Email: ");
-            string email = Console.ReadLine();
+            Console.Write("Your choice: ");
+            string choice = Console.ReadLine();
 
-            Console.Write("New Phone Number: ");
-            string phone = Console.ReadLine();
+            string field = "", inputValue = "";
+            byte[] photoData = null;
+            string query = "";
 
-            Console.Write("New Department: ");
-            string department = Console.ReadLine();
+            switch (choice)
+            {
+                case "1":
+                    field = "Name";
+                    Console.Write("Enter new Name: ");
+                    inputValue = Console.ReadLine();
+                    query = $"UPDATE Trainees SET {field} = @Value WHERE TraineeID = @ID";
+                    break;
 
-            Console.Write("New Joining Date (yyyy-mm-dd): ");
-            DateTime joiningDate = DateTime.Parse(Console.ReadLine());
+                case "2":
+                    field = "Email";
+                    Console.Write("Enter new Email: ");
+                    inputValue = Console.ReadLine();
+                    query = $"UPDATE Trainees SET {field} = @Value WHERE TraineeID = @ID";
+                    break;
 
-            Console.Write("Change Gender: ");
-            string gender = Console.ReadLine();
+                case "3":
+                    field = "PhoneNumber";
+                    Console.Write("Enter new Phone Number: ");
+                    inputValue = Console.ReadLine();
+                    query = $"UPDATE Trainees SET {field} = @Value WHERE TraineeID = @ID";
+                    break;
 
-            Console.Write("Enter Photo File Path: ");
-            string photoPath = Console.ReadLine();
+                case "4":
+                    field = "Department";
+                    Console.Write("Enter new Department: ");
+                    inputValue = Console.ReadLine();
+                    query = $"UPDATE Trainees SET {field} = @Value WHERE TraineeID = @ID";
+                    break;
 
-            string query = "UPDATE Trainees SET Name = @Name, Email = @Email, PhoneNumber = @Phone, Department = @Department, JoiningDate = @JoiningDate, Gender = @Gender, Photo = @Photo WHERE TraineeID = @ID";
+                case "5":
+                    field = "JoiningDate";
+                    Console.Write("Enter new Joining Date (yyyy-mm-dd): ");
+                    DateTime date = DateTime.Parse(Console.ReadLine());
+                    query = $"UPDATE Trainees SET {field} = @Value WHERE TraineeID = @ID";
+                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Value", date);
+                        command.Parameters.AddWithValue("@ID", id);
+
+                        connection.Open();
+                        int rows = command.ExecuteNonQuery();
+                        Console.WriteLine(rows > 0 ? "Joining Date updated successfully." : "Trainee not found.");
+                    }
+                    return;
+
+                case "6":
+                    field = "Gender";
+                    Console.Write("Enter new Gender: ");
+                    inputValue = Console.ReadLine();
+                    query = $"UPDATE Trainees SET {field} = @Value WHERE TraineeID = @ID";
+                    break;
+
+                case "7":
+                    field = "Photo";
+                    Console.Write("Enter new Photo File Path: ");
+                    string path = Console.ReadLine();
+
+                    if (File.Exists(path))
+                    {
+                        photoData = File.ReadAllBytes(path);
+                        query = $"UPDATE Trainees SET {field} = @Value WHERE TraineeID = @ID";
+                        using (SqlConnection connection = new SqlConnection(connectionString))
+                        using (SqlCommand command = new SqlCommand(query, connection))
+                        {
+                            command.Parameters.AddWithValue("@Value", photoData);
+                            command.Parameters.AddWithValue("@ID", id);
+
+                            connection.Open();
+                            int rows = command.ExecuteNonQuery();
+                            Console.WriteLine(rows > 0 ? "Photo updated successfully." : "Trainee not found.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Photo file not found.");
+                    }
+                    return;
+
+                default:
+                    Console.WriteLine("Invalid choice.");
+                    return;
+            }
+
+            //Console.Write("New Name: ");
+            //string name = Console.ReadLine();   
+
+            //Console.Write("New Email: ");
+            //string email = Console.ReadLine();
+
+            //Console.Write("New Phone Number: ");
+            //string phone = Console.ReadLine();
+
+            //Console.Write("New Department: ");
+            //string department = Console.ReadLine();
+
+            //Console.Write("New Joining Date (yyyy-mm-dd): ");
+            //DateTime joiningDate = DateTime.Parse(Console.ReadLine());
+
+            //Console.Write("Change Gender: ");
+            //string gender = Console.ReadLine();
+
+            //Console.Write("Enter Photo File Path: ");
+            //string photoPath = Console.ReadLine();
+
+            //string query = "UPDATE Trainees SET Name = @Name, Email = @Email, PhoneNumber = @Phone, Department = @Department, JoiningDate = @JoiningDate, Gender = @Gender, Photo = @Photo WHERE TraineeID = @ID";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             using (SqlCommand command = new SqlCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@Name", name);
-                command.Parameters.AddWithValue("@Email", email);
-                command.Parameters.AddWithValue("@Phone", phone);
-                command.Parameters.AddWithValue("@Department", department);
-                command.Parameters.AddWithValue("@JoiningDate", joiningDate);
-                command.Parameters.AddWithValue("@Gender", gender);
+                command.Parameters.AddWithValue("@Value", inputValue);
+                command.Parameters.AddWithValue("@ID", id);
 
-                if (!string.IsNullOrWhiteSpace(photoPath) && File.Exists(photoPath))
-                {
-                    byte[] photoData = File.ReadAllBytes(photoPath);
-                    command.Parameters.AddWithValue("@Photo", photoData);
-                }
-                else
-                {
-                    command.Parameters.AddWithValue("@Photo", DBNull.Value);
-                }
+                //command.Parameters.AddWithValue("@Name", name);
+                //command.Parameters.AddWithValue("@Email", email);
+                //command.Parameters.AddWithValue("@Phone", phone);
+                //command.Parameters.AddWithValue("@Department", department);
+                //command.Parameters.AddWithValue("@JoiningDate", joiningDate);
+                //command.Parameters.AddWithValue("@Gender", gender);
+
+                //if (!string.IsNullOrWhiteSpace(photoPath) && File.Exists(photoPath))
+                //{
+                //    byte[] photoData = File.ReadAllBytes(photoPath);
+                //    command.Parameters.AddWithValue("@Photo", photoData);
+                //}
+                //else
+                //{
+                //    command.Parameters.AddWithValue("@Photo", DBNull.Value);
+                //}
 
                 //command.Parameters.AddWithValue("@Phone", phone);
                 //command.Parameters.AddWithValue("@Department", department);
-                command.Parameters.AddWithValue("@ID", id);
+                //command.Parameters.AddWithValue("@ID", id);
 
                 connection.Open();
                 int rows = command.ExecuteNonQuery();
