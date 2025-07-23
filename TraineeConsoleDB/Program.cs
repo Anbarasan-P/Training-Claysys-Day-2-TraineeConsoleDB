@@ -165,18 +165,21 @@ namespace TraineeConsoleDB
             Console.WriteLine("5. Joining Date");
             Console.WriteLine("6. Gender");
             Console.WriteLine("7. Photo");
-            Console.Write("Your choices (e.g., 1,3,5): ");
+            Console.Write("Your choices: ");
             string[] choices = Console.ReadLine().Split(',');
 
             Dictionary<string, object> updates = new Dictionary<string, object>();
+            //Dictionary is a key value storage like that key= "Name" and value = "Anbu" 
+            //Here we store into updates
 
-            foreach (string choice in choices.Select(c => c.Trim()))
+            foreach (string choice in choices) //.Select(c => c.Trim())) 
+                //using trim to remove any whitespace around the choices
             {
                 switch (choice)
                 {
                     case "1":
                         Console.Write("Enter new Name: ");
-                        updates["Name"] = Console.ReadLine();
+                        updates["Name"] = Console.ReadLine(); //Here we store into updates["Name"] = "Anbu"
                         break;
                     case "2":
                         Console.Write("Enter new Email: ");
@@ -200,10 +203,10 @@ namespace TraineeConsoleDB
                         break;
                     case "7":
                         Console.Write("Enter Photo File Path: ");
-                        string path = Console.ReadLine();
-                        if (File.Exists(path))
+                        string photoPath = Console.ReadLine();
+                        if (File.Exists(photoPath))
                         {
-                            updates["Photo"] = File.ReadAllBytes(path);
+                            updates["Photo"] = File.ReadAllBytes(photoPath); 
                         }
                         else
                         {
@@ -222,13 +225,14 @@ namespace TraineeConsoleDB
                 return;
             }
 
-            string setClause = string.Join(", ", updates.Keys.Select(field => $"{field} = @{field}"));
+            string setClause = string.Join(", ", updates.Keys.Select(field => $"{field} = @{field}")); //Converts each Column name into SQL parameterized "Name" =>"Name" = "@Name"
+            //setClause will be like "Name = @Name, Email = @Email, PhoneNumber = @PhoneNumber" etc.
             string query = $"UPDATE Trainees SET {setClause} WHERE TraineeID = @ID";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             using (SqlCommand command = new SqlCommand(query, connection))
             {
-                foreach (var pair in updates)
+                foreach (var pair in updates) // This part adds placeholder in the query
                 {
                     command.Parameters.AddWithValue("@" + pair.Key, pair.Value);
                 }
@@ -236,7 +240,7 @@ namespace TraineeConsoleDB
 
                 connection.Open();
                 int rows = command.ExecuteNonQuery();
-                Console.WriteLine(rows > 0 ? "Trainee updated successfully." : "Trainee not found.");
+                Console.WriteLine(rows > 0 ? "Trainee updated successfully." : "Trainee not updated.");
             }
         }
 
