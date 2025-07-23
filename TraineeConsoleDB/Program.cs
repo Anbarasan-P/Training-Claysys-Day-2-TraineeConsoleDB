@@ -157,23 +157,21 @@ namespace TraineeConsoleDB
             Console.Write("Enter Trainee ID to update: ");
             int id = int.Parse(Console.ReadLine());
 
+            Console.WriteLine("Select fields to update:");
+            Console.WriteLine("1. Name");
+            Console.WriteLine("2. Email");
+            Console.WriteLine("3. Phone Number");
+            Console.WriteLine("4. Department");
+            Console.WriteLine("5. Joining Date");
+            Console.WriteLine("6. Gender");
+            Console.WriteLine("7. Photo");
+            Console.Write("Your choices (e.g., 1,3,5): ");
+            string[] choices = Console.ReadLine().Split(',');
+
             Dictionary<string, object> updates = new Dictionary<string, object>();
 
-            while (true)
+            foreach (string choice in choices.Select(c => c.Trim()))
             {
-                Console.WriteLine("\nSelect a field to update:");
-                Console.WriteLine("1. Name");
-                Console.WriteLine("2. Email");
-                Console.WriteLine("3. Phone Number");
-                Console.WriteLine("4. Department");
-                Console.WriteLine("5. Joining Date");
-                Console.WriteLine("6. Gender");
-                Console.WriteLine("7. Photo");
-                Console.WriteLine("8. Done (Save Changes)");
-
-                Console.Write("Your choice: ");
-                string choice = Console.ReadLine();
-
                 switch (choice)
                 {
                     case "1":
@@ -212,19 +210,15 @@ namespace TraineeConsoleDB
                             Console.WriteLine("Photo file not found. Skipping photo update.");
                         }
                         break;
-                    case "8":
-                        goto UPDATE_NOW;
                     default:
-                        Console.WriteLine("Invalid choice.");
+                        Console.WriteLine($"Invalid choice: {choice}");
                         break;
                 }
             }
 
-        UPDATE_NOW:
-
             if (updates.Count == 0)
             {
-                Console.WriteLine("No changes to update.");
+                Console.WriteLine("No valid fields selected for update.");
                 return;
             }
 
@@ -245,6 +239,7 @@ namespace TraineeConsoleDB
                 Console.WriteLine(rows > 0 ? "Trainee updated successfully." : "Trainee not found.");
             }
         }
+
 
 
 
